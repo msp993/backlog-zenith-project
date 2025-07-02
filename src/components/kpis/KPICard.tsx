@@ -1,7 +1,8 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
-import { TrendingUp, TrendingDown, Target, AlertCircle } from 'lucide-react';
+import { TrendingUp, TrendingDown, Target, AlertCircle, Edit3 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface KPICardProps {
@@ -13,6 +14,7 @@ interface KPICardProps {
   category: string;
   trend?: 'up' | 'down' | 'stable';
   trendValue?: number;
+  onEdit?: () => void;
   className?: string;
 }
 
@@ -33,6 +35,7 @@ export function KPICard({
   category,
   trend = 'stable',
   trendValue,
+  onEdit,
   className
 }: KPICardProps) {
   const progress = Math.min((currentValue / targetValue) * 100, 100);
@@ -58,6 +61,16 @@ export function KPICard({
             {category}
           </Badge>
           {isOffTarget && <AlertCircle className="h-4 w-4 text-destructive" />}
+          {onEdit && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={onEdit}
+              className="h-6 w-6 p-0 hover:bg-background/50"
+            >
+              <Edit3 className="h-3 w-3" />
+            </Button>
+          )}
         </div>
       </CardHeader>
       <CardContent>

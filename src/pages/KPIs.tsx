@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useKPIs } from '@/hooks/useKPIs';
 import { KPICard } from '@/components/kpis/KPICard';
 import { TrendChart } from '@/components/kpis/TrendChart';
@@ -5,6 +6,7 @@ import { MetricsOverview } from '@/components/kpis/MetricsOverview';
 import { GoalProgress } from '@/components/kpis/GoalProgress';
 import { TimeRangeSelector } from '@/components/kpis/TimeRangeSelector';
 import { CategoryDistribution } from '@/components/kpis/CategoryDistribution';
+import { KPIUpdateModal } from '@/components/kpis/KPIUpdateModal';
 import { Button } from '@/components/ui/button';
 import { RefreshCw, Download, Settings } from 'lucide-react';
 
@@ -15,8 +17,18 @@ export default function KPIs() {
     filters,
     setFilters,
     kpiTrends,
-    metricsOverview
+    metricsOverview,
+    updateKPI,
+    isUpdating
   } = useKPIs();
+
+  const [selectedKPI, setSelectedKPI] = useState<any>(null);
+  const [updateModalOpen, setUpdateModalOpen] = useState(false);
+
+  const handleEditKPI = (kpi: any) => {
+    setSelectedKPI(kpi);
+    setUpdateModalOpen(true);
+  };
 
   const handleExport = () => {
     // TODO: Implement export functionality
@@ -101,6 +113,7 @@ export default function KPIs() {
               category={kpi.category || 'otros'}
               trend={trend}
               trendValue={trendValue}
+              onEdit={() => handleEditKPI(kpi)}
             />
           );
         })}
@@ -129,6 +142,15 @@ export default function KPIs() {
           );
         })}
       </div>
+
+      {/* Update Modal */}
+      <KPIUpdateModal
+        kpi={selectedKPI}
+        open={updateModalOpen}
+        onOpenChange={setUpdateModalOpen}
+        onUpdate={updateKPI}
+        isUpdating={isUpdating}
+      />
     </div>
   );
 }

@@ -177,6 +177,45 @@ export type Database = {
           },
         ]
       }
+      kpi_history: {
+        Row: {
+          id: string
+          kpi_id: string
+          recorded_at: string
+          updated_by: string
+          value: number
+        }
+        Insert: {
+          id?: string
+          kpi_id: string
+          recorded_at?: string
+          updated_by: string
+          value: number
+        }
+        Update: {
+          id?: string
+          kpi_id?: string
+          recorded_at?: string
+          updated_by?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "kpi_history_kpi_id_fkey"
+            columns: ["kpi_id"]
+            isOneToOne: false
+            referencedRelation: "kpis"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "kpi_history_updated_by_fkey"
+            columns: ["updated_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       kpis: {
         Row: {
           category: string | null
