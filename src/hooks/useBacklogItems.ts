@@ -12,8 +12,7 @@ export interface BacklogItem {
   acceptance_criteria?: string;
   priority: 'P1' | 'P2' | 'P3' | 'P4' | 'P5' | 'P6';
   status: 'pendiente' | 'en_proceso' | 'qa' | 'completado' | 'pausado';
-  business_value: 'alto' | 'medio' | 'bajo';
-  story_points?: number;
+  notes?: string;
   assignee_id?: string;
   created_by?: string;
   created_at: string;

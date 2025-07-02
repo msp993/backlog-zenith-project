@@ -3,21 +3,20 @@ import { CSS } from '@dnd-kit/utilities';
 import { TableCell, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { BacklogItem } from '@/hooks/useBacklogItems';
-import { PriorityDot } from './PriorityBadge';
-import { StatusBadge } from './StatusBadge';
-import { MoreHorizontal, GripVertical, User, Clock } from 'lucide-react';
-import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { InlineEditCell } from './InlineEditCell';
+import { MoreHorizontal, GripVertical } from 'lucide-react';
 
 interface SortableBacklogRowProps {
   item: BacklogItem;
   isSelected: boolean;
   onSelect: (checked: boolean) => void;
   onClick: () => void;
+  onFieldUpdate?: (id: string, field: keyof BacklogItem, value: any) => Promise<void>;
+  teamMembers?: any[];
 }
 
-export function SortableBacklogRow({ item, isSelected, onSelect, onClick }: SortableBacklogRowProps) {
+export function SortableBacklogRow({ item, isSelected, onSelect, onClick, onFieldUpdate, teamMembers = [] }: SortableBacklogRowProps) {
   const {
     attributes,
     listeners,
@@ -32,24 +31,6 @@ export function SortableBacklogRow({ item, isSelected, onSelect, onClick }: Sort
     transition,
   };
 
-  const getBusinessValueColor = (value: string) => {
-    switch (value) {
-      case 'alto': return 'bg-success text-success-foreground';
-      case 'medio': return 'bg-warning text-warning-foreground';
-      case 'bajo': return 'bg-muted text-muted-foreground';
-      default: return 'bg-muted text-muted-foreground';
-    }
-  };
-
-  const getInitials = (name?: string, email?: string) => {
-    if (name) {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
-    }
-    if (email) {
-      return email.slice(0, 2).toUpperCase();
-    }
-    return 'SA';
-  };
 
   return (
     <TableRow
@@ -82,63 +63,65 @@ export function SortableBacklogRow({ item, isSelected, onSelect, onClick }: Sort
           >
             <GripVertical className="h-4 w-4 text-muted-foreground" />
           </button>
-          <PriorityDot priority={item.priority} />
+          <InlineEditCell
+            item={item}
+            field="priority"
+            value={item.priority}
+            onSave={onFieldUpdate || (() => Promise.resolve())}
+            teamMembers={teamMembers}
+          />
         </div>
       </TableCell>
 
       <TableCell>
         <div className="space-y-1">
-          <div className="font-medium text-foreground line-clamp-1">
-            {item.title}
-          </div>
+          <InlineEditCell
+            item={item}
+            field="title"
+            value={item.title}
+            onSave={onFieldUpdate || (() => Promise.resolve())}
+            teamMembers={teamMembers}
+          />
           {item.description && (
-            <div className="text-sm text-muted-foreground line-clamp-2">
-              {item.description}
-            </div>
+            <InlineEditCell
+              item={item}
+              field="description"
+              value={item.description}
+              onSave={onFieldUpdate || (() => Promise.resolve())}
+              teamMembers={teamMembers}
+            />
           )}
         </div>
       </TableCell>
 
       <TableCell>
-        <StatusBadge status={item.status} />
+        <InlineEditCell
+          item={item}
+          field="status"
+          value={item.status}
+          onSave={onFieldUpdate || (() => Promise.resolve())}
+          teamMembers={teamMembers}
+        />
       </TableCell>
 
       <TableCell>
-        {item.assignee ? (
-          <div className="flex items-center gap-2">
-            <Avatar className="h-6 w-6">
-              <AvatarFallback className="text-xs bg-primary/10">
-                {getInitials(item.assignee.full_name, item.assignee.email)}
-              </AvatarFallback>
-            </Avatar>
-            <span className="text-sm text-foreground">
-              {item.assignee.full_name || item.assignee.email}
-            </span>
-          </div>
-        ) : (
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <User className="h-4 w-4" />
-            <span className="text-sm">Sin asignar</span>
-          </div>
-        )}
+        <InlineEditCell
+          item={item}
+          field="assignee_id"
+          value={item.assignee_id}
+          onSave={onFieldUpdate || (() => Promise.resolve())}
+          teamMembers={teamMembers}
+        />
       </TableCell>
 
-      <TableCell className="text-center">
-        <div className="flex items-center justify-center gap-1">
-          <Clock className="h-3 w-3 text-muted-foreground" />
-          <span className="text-sm font-medium">
-            {item.story_points || 0}
-          </span>
-        </div>
-      </TableCell>
-
-      <TableCell>
-        <Badge
-          variant="outline"
-          className={`border-0 text-xs ${getBusinessValueColor(item.business_value)}`}
-        >
-          {item.business_value}
-        </Badge>
+      <TableCell className="w-[200px]">
+        <InlineEditCell
+          item={item}
+          field="notes"
+          value={item.notes}
+          onSave={onFieldUpdate || (() => Promise.resolve())}
+          teamMembers={teamMembers}
+        />
       </TableCell>
 
       <TableCell onClick={(e) => e.stopPropagation()}>

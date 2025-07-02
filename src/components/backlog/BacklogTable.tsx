@@ -7,11 +7,11 @@ import { Card } from '@/components/ui/card';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { BacklogItem } from '@/hooks/useBacklogItems';
-import { PriorityBadge, PriorityDot } from './PriorityBadge';
-import { StatusBadge } from './StatusBadge';
+import { InlineEditCell } from './InlineEditCell';
 import { SortableBacklogRow } from './SortableBacklogRow';
-import { ArrowUpDown, MoreHorizontal, User, Clock } from 'lucide-react';
+import { ArrowUpDown, ChevronDown, ChevronRight } from 'lucide-react';
 
 interface BacklogTableProps {
   items: BacklogItem[];
@@ -19,10 +19,12 @@ interface BacklogTableProps {
   onSelectionChange: (selectedItems: string[]) => void;
   onItemClick: (item: BacklogItem) => void;
   onItemsReorder?: (items: BacklogItem[]) => void;
+  onFieldUpdate?: (id: string, field: keyof BacklogItem, value: any) => Promise<void>;
+  teamMembers?: any[];
   loading?: boolean;
 }
 
-type SortField = 'priority' | 'title' | 'status' | 'assignee' | 'story_points' | 'created_at';
+type SortField = 'priority' | 'title' | 'status' | 'assignee' | 'notes' | 'created_at';
 type SortDirection = 'asc' | 'desc';
 
 export function BacklogTable({ 
@@ -31,10 +33,17 @@ export function BacklogTable({
   onSelectionChange, 
   onItemClick,
   onItemsReorder,
+  onFieldUpdate,
+  teamMembers = [],
   loading 
 }: BacklogTableProps) {
   const [sortField, setSortField] = useState<SortField>('priority');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
+  const [completedCollapsed, setCompletedCollapsed] = useState(false);
+
+  // Separate active and completed items
+  const activeItems = items.filter(item => item.status !== 'completado');
+  const completedItems = items.filter(item => item.status === 'completado');
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -80,17 +89,21 @@ export function BacklogTable({
     const { active, over } = event;
 
     if (active.id !== over.id && onItemsReorder) {
-      const oldIndex = items.findIndex(item => item.id === active.id);
-      const newIndex = items.findIndex(item => item.id === over.id);
+      // Only allow reordering within active items
+      const oldIndex = activeItems.findIndex(item => item.id === active.id);
+      const newIndex = activeItems.findIndex(item => item.id === over.id);
       
-      const newItems = arrayMove(items, oldIndex, newIndex);
-      onItemsReorder(newItems);
+      if (oldIndex !== -1 && newIndex !== -1) {
+        const newActiveItems = arrayMove(activeItems, oldIndex, newIndex);
+        const newItems = [...newActiveItems, ...completedItems];
+        onItemsReorder(newItems);
+      }
     }
   };
 
   const handleSelectAll = (checked: boolean) => {
     if (checked) {
-      onSelectionChange(items.map(item => item.id));
+      onSelectionChange(activeItems.map(item => item.id));
     } else {
       onSelectionChange([]);
     }
@@ -104,8 +117,8 @@ export function BacklogTable({
     }
   };
 
-  const isAllSelected = items.length > 0 && selectedItems.length === items.length;
-  const isIndeterminate = selectedItems.length > 0 && selectedItems.length < items.length;
+  const isAllSelected = activeItems.length > 0 && selectedItems.length === activeItems.length;
+  const isIndeterminate = selectedItems.length > 0 && selectedItems.length < activeItems.length;
 
   const SortButton = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <Button
@@ -174,29 +187,140 @@ export function BacklogTable({
               <TableHead>
                 <SortButton field="assignee">Responsable</SortButton>
               </TableHead>
-              <TableHead className="w-[100px]">
-                <SortButton field="story_points">Story Points</SortButton>
+              <TableHead className="w-[200px]">
+                <SortButton field="notes">Notas</SortButton>
               </TableHead>
-              <TableHead className="w-[120px]">Valor de Negocio</TableHead>
               <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
 
           <TableBody>
-            <SortableContext items={items.map(item => item.id)} strategy={verticalListSortingStrategy}>
-              {sortedItems.map((item) => (
+            <SortableContext items={activeItems.map(item => item.id)} strategy={verticalListSortingStrategy}>
+              {sortedItems.filter(item => item.status !== 'completado').map((item) => (
                 <SortableBacklogRow
                   key={item.id}
                   item={item}
                   isSelected={selectedItems.includes(item.id)}
                   onSelect={(checked) => handleSelectItem(item.id, checked)}
                   onClick={() => onItemClick(item)}
+                  onFieldUpdate={onFieldUpdate}
+                  teamMembers={teamMembers}
                 />
               ))}
             </SortableContext>
           </TableBody>
         </Table>
       </DndContext>
+      
+      {completedItems.length > 0 && (
+        <Collapsible open={!completedCollapsed} onOpenChange={setCompletedCollapsed}>
+          <CollapsibleTrigger asChild>
+            <Button variant="ghost" className="w-full justify-between p-4 h-auto">
+              <div className="flex items-center gap-2">
+                {completedCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                <span className="font-medium">Elementos Completados</span>
+                <Badge variant="outline">{completedItems.length}</Badge>
+              </div>
+            </Button>
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Table>
+              <TableBody>
+                {sortedItems.filter(item => item.status === 'completado').map((item) => (
+                  <TableRow
+                    key={item.id}
+                    className="opacity-60 border-glass-border hover:bg-glass/30 cursor-pointer"
+                    onClick={() => onItemClick(item)}
+                  >
+                    <TableCell className="w-[50px]">
+                      <Checkbox
+                        checked={selectedItems.includes(item.id)}
+                        onCheckedChange={(checked) => handleSelectItem(item.id, !!checked)}
+                        onClick={(e) => e.stopPropagation()}
+                      />
+                    </TableCell>
+                    
+                    <TableCell className="w-[50px]">
+                      <InlineEditCell
+                        item={item}
+                        field="priority"
+                        value={item.priority}
+                        onSave={onFieldUpdate || (() => Promise.resolve())}
+                        teamMembers={teamMembers}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="space-y-1">
+                        <InlineEditCell
+                          item={item}
+                          field="title"
+                          value={item.title}
+                          onSave={onFieldUpdate || (() => Promise.resolve())}
+                          teamMembers={teamMembers}
+                        />
+                        {item.description && (
+                          <InlineEditCell
+                            item={item}
+                            field="description"
+                            value={item.description}
+                            onSave={onFieldUpdate || (() => Promise.resolve())}
+                            teamMembers={teamMembers}
+                          />
+                        )}
+                      </div>
+                    </TableCell>
+
+                    <TableCell>
+                      <InlineEditCell
+                        item={item}
+                        field="status"
+                        value={item.status}
+                        onSave={onFieldUpdate || (() => Promise.resolve())}
+                        teamMembers={teamMembers}
+                      />
+                    </TableCell>
+
+                    <TableCell>
+                      <InlineEditCell
+                        item={item}
+                        field="assignee_id"
+                        value={item.assignee_id}
+                        onSave={onFieldUpdate || (() => Promise.resolve())}
+                        teamMembers={teamMembers}
+                      />
+                    </TableCell>
+
+                    <TableCell className="w-[200px]">
+                      <InlineEditCell
+                        item={item}
+                        field="notes"
+                        value={item.notes}
+                        onSave={onFieldUpdate || (() => Promise.resolve())}
+                        teamMembers={teamMembers}
+                      />
+                    </TableCell>
+
+                    <TableCell className="w-[50px]">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 w-8 p-0 hover:bg-muted"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onItemClick(item);
+                        }}
+                      >
+                        <ArrowUpDown className="h-4 w-4" />
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </CollapsibleContent>
+        </Collapsible>
+      )}
     </Card>
   );
 }

@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Plus } from 'lucide-react';
 import { useBacklogItems, BacklogItem } from '@/hooks/useBacklogItems';
+import { useProfiles } from '@/hooks/useProfiles';
 import { FilterBar } from '@/components/backlog/FilterBar';
 import { BacklogTable } from '@/components/backlog/BacklogTable';
 import { BacklogModal } from '@/components/backlog/BacklogModal';
@@ -19,6 +20,8 @@ export default function Backlog() {
     deleteItem,
     bulkUpdateStatus
   } = useBacklogItems();
+  
+  const { profiles } = useProfiles();
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
@@ -69,7 +72,9 @@ export default function Backlog() {
     }
   };
 
-  const totalStoryPoints = filteredItems.reduce((acc, item) => acc + (item.story_points || 0), 0);
+  const handleFieldUpdate = async (id: string, field: keyof BacklogItem, value: any) => {
+    await updateItem(id, { [field]: value });
+  };
 
   return (
     <div className="space-y-6">
@@ -99,7 +104,10 @@ export default function Backlog() {
           {filteredItems.length} historia{filteredItems.length !== 1 ? 's' : ''}
         </Badge>
         <Badge variant="outline" className="glass-card">
-          {totalStoryPoints} story points
+          {filteredItems.filter(item => item.status !== 'completado').length} activas
+        </Badge>
+        <Badge variant="outline" className="glass-card">
+          {filteredItems.filter(item => item.status === 'completado').length} completadas
         </Badge>
         {selectedItems.length > 0 && (
           <Badge variant="secondary">
@@ -122,6 +130,8 @@ export default function Backlog() {
         selectedItems={selectedItems}
         onSelectionChange={setSelectedItems}
         onItemClick={handleEditItem}
+        onFieldUpdate={handleFieldUpdate}
+        teamMembers={profiles}
         loading={loading}
       />
 

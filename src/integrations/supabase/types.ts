@@ -54,14 +54,13 @@ export type Database = {
         Row: {
           acceptance_criteria: string | null
           assignee_id: string | null
-          business_value: string | null
           created_at: string | null
           created_by: string | null
           description: string | null
           id: string
+          notes: string | null
           priority: string | null
           status: string | null
-          story_points: number | null
           title: string
           updated_at: string | null
           user_story: string | null
@@ -69,14 +68,13 @@ export type Database = {
         Insert: {
           acceptance_criteria?: string | null
           assignee_id?: string | null
-          business_value?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          notes?: string | null
           priority?: string | null
           status?: string | null
-          story_points?: number | null
           title: string
           updated_at?: string | null
           user_story?: string | null
@@ -84,14 +82,13 @@ export type Database = {
         Update: {
           acceptance_criteria?: string | null
           assignee_id?: string | null
-          business_value?: string | null
           created_at?: string | null
           created_by?: string | null
           description?: string | null
           id?: string
+          notes?: string | null
           priority?: string | null
           status?: string | null
-          story_points?: number | null
           title?: string
           updated_at?: string | null
           user_story?: string | null

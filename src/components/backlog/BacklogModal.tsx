@@ -29,8 +29,7 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
     acceptance_criteria: '',
     priority: 'P3',
     status: 'pendiente',
-    business_value: 'medio',
-    story_points: 1,
+    notes: '',
     assignee_id: undefined
   });
 
@@ -43,8 +42,7 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
         acceptance_criteria: item.acceptance_criteria || '',
         priority: item.priority,
         status: item.status,
-        business_value: item.business_value,
-        story_points: item.story_points,
+        notes: item.notes || '',
         assignee_id: item.assignee_id
       });
     } else {
@@ -55,8 +53,7 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
         acceptance_criteria: '',
         priority: 'P3',
         status: 'pendiente',
-        business_value: 'medio',
-        story_points: 1,
+        notes: '',
         assignee_id: undefined
       });
     }
@@ -199,45 +196,20 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
               </Select>
             </div>
 
-            {/* Business Value */}
-            <div className="space-y-2">
-              <Label className="text-foreground font-medium">Valor de Negocio</Label>
-              <Select
-                value={formData.business_value}
-                onValueChange={(value) => setFormData({ ...formData, business_value: value as any })}
-              >
-                <SelectTrigger className="glass-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                  <SelectItem value="alto">Alto</SelectItem>
-                  <SelectItem value="medio">Medio</SelectItem>
-                  <SelectItem value="bajo">Bajo</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
 
-            {/* Story Points */}
-            <div className="space-y-2">
-              <Label htmlFor="story_points" className="text-foreground font-medium">
-                Story Points
-              </Label>
-              <Select
-                value={formData.story_points?.toString()}
-                onValueChange={(value) => setFormData({ ...formData, story_points: parseInt(value) })}
-              >
-                <SelectTrigger className="glass-card">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                  {[1, 2, 3, 5, 8, 13, 21].map((points) => (
-                    <SelectItem key={points} value={points.toString()}>
-                      {points} {points === 1 ? 'punto' : 'puntos'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          {/* Notes */}
+          <div className="space-y-2">
+            <Label htmlFor="notes" className="text-foreground font-medium">
+              Notas
+            </Label>
+            <Textarea
+              id="notes"
+              value={formData.notes}
+              onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+              placeholder="Notas adicionales sobre la historia de usuario"
+              className="glass-card min-h-[80px]"
+            />
           </div>
 
           {/* Assignee */}
@@ -272,11 +244,6 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
               <span className="text-sm text-muted-foreground">Vista previa:</span>
               {formData.priority && <PriorityBadge priority={formData.priority} />}
               {formData.status && <StatusBadge status={formData.status} />}
-              {formData.business_value && (
-                <Badge variant="outline" className="text-xs">
-                  Valor: {formData.business_value}
-                </Badge>
-              )}
             </div>
           )}
         </div>
