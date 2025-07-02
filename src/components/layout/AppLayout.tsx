@@ -2,9 +2,15 @@ import { useState } from 'react';
 import { Outlet } from 'react-router-dom';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { CollaborationSidebar } from '../collaboration/CollaborationSidebar';
+import { useRealtime } from '@/hooks/useRealtime';
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  
+  // Mock user ID - in real app, this would come from auth
+  const currentUserId = "current-user-id";
+  const { onlineUsers } = useRealtime("backlog_items", currentUserId);
 
   return (
     <div className="min-h-screen bg-background font-sans">
@@ -20,10 +26,17 @@ export function AppLayout() {
           {/* Header */}
           <Header onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
           
-          {/* Page content */}
-          <main className="flex-1 overflow-y-auto p-6">
-            <div className="mx-auto max-w-7xl">
-              <Outlet />
+          {/* Page content with collaboration sidebar */}
+          <main className="flex-1 overflow-y-auto">
+            <div className="flex h-full">
+              <div className="flex-1 p-6">
+                <div className="mx-auto max-w-6xl">
+                  <Outlet />
+                </div>
+              </div>
+              <div className="w-80 p-4 border-l border-border bg-muted/20">
+                <CollaborationSidebar onlineUsers={onlineUsers} />
+              </div>
             </div>
           </main>
         </div>
