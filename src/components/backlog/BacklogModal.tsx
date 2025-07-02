@@ -244,14 +244,14 @@ export function BacklogModal({ open, onOpenChange, item, onSave, onDelete }: Bac
           <div className="space-y-2">
             <Label className="text-foreground font-medium">Responsable</Label>
             <Select
-              value={formData.assignee_id || ''}
-              onValueChange={(value) => setFormData({ ...formData, assignee_id: value || undefined })}
+              value={formData.assignee_id || 'unassigned'}
+              onValueChange={(value) => setFormData({ ...formData, assignee_id: value === 'unassigned' ? undefined : value })}
             >
               <SelectTrigger className="glass-card">
                 <SelectValue placeholder="Seleccionar responsable" />
               </SelectTrigger>
               <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                <SelectItem value="">Sin asignar</SelectItem>
+                <SelectItem value="unassigned">Sin asignar</SelectItem>
                 {profiles.map((profile) => (
                   <SelectItem key={profile.id} value={profile.id}>
                     <div className="flex items-center gap-2">

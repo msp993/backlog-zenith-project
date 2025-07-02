@@ -22,7 +22,7 @@ export function FilterBar({ filters, onFiltersChange, totalItems, filteredItems 
   const handleFilterChange = (key: keyof FilterOptions, value: string) => {
     onFiltersChange({
       ...filters,
-      [key]: value || undefined
+      [key]: value === 'all' ? undefined : value
     });
   };
 
@@ -88,7 +88,7 @@ export function FilterBar({ filters, onFiltersChange, totalItems, filteredItems 
                   <SelectValue placeholder="Todos los estados" />
                 </SelectTrigger>
                 <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                  <SelectItem value="">Todos los estados</SelectItem>
+                  <SelectItem value="all">Todos los estados</SelectItem>
                   <SelectItem value="pendiente">Pendiente</SelectItem>
                   <SelectItem value="en_proceso">En Proceso</SelectItem>
                   <SelectItem value="qa">En QA</SelectItem>
@@ -108,7 +108,7 @@ export function FilterBar({ filters, onFiltersChange, totalItems, filteredItems 
                   <SelectValue placeholder="Todas las prioridades" />
                 </SelectTrigger>
                 <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                  <SelectItem value="">Todas las prioridades</SelectItem>
+                  <SelectItem value="all">Todas las prioridades</SelectItem>
                   <SelectItem value="P1">P1 - Crítica</SelectItem>
                   <SelectItem value="P2">P2 - Alta</SelectItem>
                   <SelectItem value="P3">P3 - Media</SelectItem>
@@ -129,7 +129,7 @@ export function FilterBar({ filters, onFiltersChange, totalItems, filteredItems 
                   <SelectValue placeholder="Todos los responsables" />
                 </SelectTrigger>
                 <SelectContent className="glass-card bg-background/95 backdrop-blur-xl">
-                  <SelectItem value="">Todos los responsables</SelectItem>
+                  <SelectItem value="all">Todos los responsables</SelectItem>
                   <SelectItem value="unassigned">Sin asignar</SelectItem>
                   {profiles.map((profile) => (
                     <SelectItem key={profile.id} value={profile.id}>
