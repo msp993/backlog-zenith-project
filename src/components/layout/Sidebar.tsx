@@ -2,8 +2,6 @@ import { cn } from '@/lib/utils';
 import { 
   LayoutDashboard, 
   ListTodo, 
-  Bug, 
-  BarChart3, 
   Users, 
   Settings 
 } from 'lucide-react';
@@ -17,8 +15,6 @@ interface SidebarProps {
 const navigation = [
   { name: 'Dashboard', href: '/', icon: LayoutDashboard },
   { name: 'Backlog', href: '/backlog', icon: ListTodo },
-  { name: 'Bugs', href: '/bugs', icon: Bug },
-  { name: 'KPIs', href: '/kpis', icon: BarChart3 },
   { name: 'Team', href: '/team', icon: Users },
   { name: 'Settings', href: '/settings', icon: Settings },
 ];
@@ -37,8 +33,8 @@ export function Sidebar({ open, onToggle }: SidebarProps) {
           </div>
           {open && (
             <div className="flex flex-col">
-              <h1 className="text-lg font-semibold text-foreground">ProductFlow</h1>
-              <p className="text-xs text-muted-foreground">Backlog Manager</p>
+              <h1 className="text-lg font-semibold text-foreground">BacklogPro</h1>
+              <p className="text-xs text-muted-foreground">Gestión Ágil</p>
             </div>
           )}
         </div>

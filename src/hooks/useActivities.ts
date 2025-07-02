@@ -6,7 +6,7 @@ export interface Activity {
   id: string;
   user_id: string;
   action_type: 'created' | 'updated' | 'deleted' | 'commented';
-  entity_type: 'backlog_item' | 'bug' | 'kpi';
+  entity_type: 'backlog_item'; // Only backlog items now
   entity_id: string;
   entity_title: string;
   details?: string;
@@ -21,7 +21,6 @@ export interface Activity {
 
 export async function logActivity(
   action_type: Activity['action_type'],
-  entity_type: Activity['entity_type'],
   entity_id: string,
   entity_title: string,
   details?: string
@@ -39,7 +38,7 @@ export async function logActivity(
       .insert([{
         user_id: user.id,
         action_type,
-        entity_type,
+        entity_type: 'backlog_item', // Always backlog_item now
         entity_id,
         entity_title,
         details

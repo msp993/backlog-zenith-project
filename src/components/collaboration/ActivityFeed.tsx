@@ -3,7 +3,7 @@ import { es } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import { Activity, Clock, FileText, Bug, BarChart3, MessageSquare, Plus, Edit, Trash2 } from 'lucide-react';
+import { Activity, Clock, FileText, MessageSquare, Plus, Edit, Trash2 } from 'lucide-react';
 import { useActivities } from '@/hooks/useActivities';
 import { ScrollArea } from '@/components/ui/scroll-area';
 
@@ -21,8 +21,6 @@ const actionIcons = {
 
 const entityIcons = {
   backlog_item: FileText,
-  bug: Bug,
-  kpi: BarChart3,
 };
 
 const actionColors = {
@@ -34,8 +32,6 @@ const actionColors = {
 
 const entityLabels = {
   backlog_item: 'Historia',
-  bug: 'Bug',
-  kpi: 'KPI',
 };
 
 export function ActivityFeed({ limit = 8, className }: ActivityFeedProps) {

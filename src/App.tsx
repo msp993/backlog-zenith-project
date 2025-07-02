@@ -9,8 +9,6 @@ import { AuthPage } from "@/components/auth/AuthPage";
 import { AppLayout } from "./components/layout/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import Backlog from "./pages/Backlog";
-import Bugs from "./pages/Bugs";
-import KPIs from "./pages/KPIs";
 import Team from "./pages/Team";
 import Settings from "./pages/Settings";
 import NotFound from "./pages/NotFound";
@@ -33,8 +31,6 @@ const App = () => (
             }>
               <Route index element={<Dashboard />} />
               <Route path="backlog" element={<Backlog />} />
-              <Route path="bugs" element={<Bugs />} />
-              <Route path="kpis" element={<KPIs />} />
               <Route path="team" element={<Team />} />
               <Route path="settings" element={<Settings />} />
             </Route>

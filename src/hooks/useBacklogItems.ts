@@ -111,7 +111,7 @@ export function useBacklogItems() {
       setItems(prev => [data as any, ...prev]);
       
       // Log activity
-      await logActivity('created', 'backlog_item', data.id, data.title);
+      await logActivity('created', data.id, data.title);
       
       toast({
         title: "Historia creada",
@@ -150,7 +150,7 @@ export function useBacklogItems() {
       setItems(prev => prev.map(item => item.id === id ? data as any : item));
       
       // Log activity
-      await logActivity('updated', 'backlog_item', data.id, data.title, 
+      await logActivity('updated', data.id, data.title, 
         `Actualizado: ${Object.keys(updates).join(', ')}`);
       
       toast({
@@ -188,7 +188,7 @@ export function useBacklogItems() {
       setItems(prev => prev.filter(item => item.id !== id));
       
       // Log activity
-      await logActivity('deleted', 'backlog_item', id, itemTitle);
+      await logActivity('deleted', id, itemTitle);
       
       toast({
         title: "Historia eliminada",
