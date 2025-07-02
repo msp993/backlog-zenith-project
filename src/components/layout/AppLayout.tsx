@@ -4,13 +4,12 @@ import { Sidebar } from './Sidebar';
 import { Header } from './Header';
 import { CollaborationSidebar } from '../collaboration/CollaborationSidebar';
 import { useRealtime } from '@/hooks/useRealtime';
+import { useAuth } from '@/contexts/AuthContext';
 
 export function AppLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  
-  // Mock user ID - in real app, this would come from auth
-  const currentUserId = "current-user-id";
-  const { onlineUsers } = useRealtime("backlog_items", currentUserId);
+  const { user } = useAuth();
+  const { onlineUsers } = useRealtime("backlog_items", user?.id);
 
   return (
     <div className="min-h-screen bg-background font-sans">

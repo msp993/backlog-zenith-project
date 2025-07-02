@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface BacklogItem {
   id: string;
@@ -40,6 +41,7 @@ export function useBacklogItems() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<FilterOptions>({});
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const fetchItems = async () => {
     try {
@@ -93,7 +95,7 @@ export function useBacklogItems() {
     try {
       const { data, error } = await supabase
         .from('backlog_items')
-        .insert([itemData as any])
+        .insert([{ ...itemData, created_by: user?.id } as any])
         .select(`
           *,
           assignee:assignee_id(id, full_name, email),

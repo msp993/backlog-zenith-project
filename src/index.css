@@ -115,6 +115,11 @@
   .btn-glass {
     @apply glass-card hover:bg-glass/90 text-foreground font-medium px-6 py-3 transition-all duration-300 hover:scale-105;
   }
+
+  /* Form styles */
+  .glass-input {
+    @apply bg-background/50 border-glass-border backdrop-blur-sm focus:border-primary/50;
+  }
 }
 
 @layer base {

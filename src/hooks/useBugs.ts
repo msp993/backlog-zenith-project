@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { useAuth } from '@/contexts/AuthContext';
 
 export interface Bug {
   id: string;
@@ -55,6 +56,7 @@ export function useBugs() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<BugFilterOptions>({});
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const fetchBugs = async () => {
     try {
@@ -112,7 +114,7 @@ export function useBugs() {
     try {
       const { data, error } = await supabase
         .from('bugs')
-        .insert([bugData as any])
+        .insert([{ ...bugData, created_by: user?.id } as any])
         .select(`
           *,
           assignee:assignee_id(id, full_name, email),

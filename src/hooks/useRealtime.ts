@@ -71,7 +71,7 @@ export function useRealtime(tableName: string, userId?: string) {
 
     const userStatus = {
       user_id: userId,
-      user_name: 'Usuario', // This should come from user profile
+      user_name: 'Usuario', // TODO: Get from user profile when profiles are implemented
       online_at: new Date().toISOString(),
       page: window.location.pathname,
     };
