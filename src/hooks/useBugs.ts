@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { logActivity } from '@/hooks/useActivities';
 
 export interface Bug {
   id: string;
@@ -128,6 +129,10 @@ export function useBugs() {
       }
 
       setBugs(prev => [data as any, ...prev]);
+      
+      // Log activity
+      await logActivity('created', 'bug', data.id, data.title);
+      
       toast({
         title: "Bug reportado",
         description: "El bug se ha reportado exitosamente",
@@ -164,6 +169,11 @@ export function useBugs() {
       }
 
       setBugs(prev => prev.map(bug => bug.id === id ? data as any : bug));
+      
+      // Log activity
+      await logActivity('updated', 'bug', data.id, data.title, 
+        `Actualizado: ${Object.keys(updates).join(', ')}`);
+      
       toast({
         title: "Bug actualizado",
         description: "Los cambios se han guardado exitosamente",
@@ -183,6 +193,10 @@ export function useBugs() {
 
   const deleteBug = async (id: string) => {
     try {
+      // Get bug title before deletion for activity log
+      const bugToDelete = bugs.find(bug => bug.id === id);
+      const bugTitle = bugToDelete?.title || 'Bug eliminado';
+      
       const { error } = await supabase
         .from('bugs')
         .delete()
@@ -193,6 +207,10 @@ export function useBugs() {
       }
 
       setBugs(prev => prev.filter(bug => bug.id !== id));
+      
+      // Log activity
+      await logActivity('deleted', 'bug', id, bugTitle);
+      
       toast({
         title: "Bug eliminado",
         description: "El bug se ha eliminado exitosamente",

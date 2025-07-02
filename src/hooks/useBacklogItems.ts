@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { logActivity } from '@/hooks/useActivities';
 
 export interface BacklogItem {
   id: string;
@@ -108,6 +109,10 @@ export function useBacklogItems() {
       }
 
       setItems(prev => [data as any, ...prev]);
+      
+      // Log activity
+      await logActivity('created', 'backlog_item', data.id, data.title);
+      
       toast({
         title: "Historia creada",
         description: "La historia de usuario se ha creado exitosamente",
@@ -143,6 +148,11 @@ export function useBacklogItems() {
       }
 
       setItems(prev => prev.map(item => item.id === id ? data as any : item));
+      
+      // Log activity
+      await logActivity('updated', 'backlog_item', data.id, data.title, 
+        `Actualizado: ${Object.keys(updates).join(', ')}`);
+      
       toast({
         title: "Historia actualizada",
         description: "Los cambios se han guardado exitosamente",
@@ -162,6 +172,10 @@ export function useBacklogItems() {
 
   const deleteItem = async (id: string) => {
     try {
+      // Get item title before deletion for activity log
+      const itemToDelete = items.find(item => item.id === id);
+      const itemTitle = itemToDelete?.title || 'Historia eliminada';
+      
       const { error } = await supabase
         .from('backlog_items')
         .delete()
@@ -172,6 +186,10 @@ export function useBacklogItems() {
       }
 
       setItems(prev => prev.filter(item => item.id !== id));
+      
+      // Log activity
+      await logActivity('deleted', 'backlog_item', id, itemTitle);
+      
       toast({
         title: "Historia eliminada",
         description: "La historia de usuario se ha eliminado exitosamente",
